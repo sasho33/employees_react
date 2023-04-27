@@ -15,8 +15,7 @@ class EmployeesListItem extends Component {
   }
   render() {
     const { name, salary } = this.props;
-    const { bonus } = this.state;
-    const { star } = this.state;
+    const { bonus, star } = this.state;
 
     let employeeClass = 'list-group-item d-flex justify-content-between';
     const increaseSalary = () => {
@@ -28,7 +27,6 @@ class EmployeesListItem extends Component {
 
     const starHandler = () => {
       this.setState(({ star }) => ({ star: !star }));
-      console.log(star);
     };
     if (star === true) {
       employeeClass += ' like';
