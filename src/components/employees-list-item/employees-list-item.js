@@ -1,7 +1,7 @@
 import './employees-list-item.css';
 
 const EmployeesListItem = (props) => {
-  const { name, salary, onDelete, onToggleIncrease, onToggleBonus } = this.props;
+  const { name, salary, onDelete, onToggleIncrease, onToggleBonus } = props;
 
   let employeeClass = 'list-group-item d-flex justify-content-between';
 
