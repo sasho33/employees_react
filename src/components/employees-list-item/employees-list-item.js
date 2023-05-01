@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import './employees-list-item.css';
 
 const EmployeesListItem = (props) => {
-  const { name, salary, onDelete, onToggleProp, bonus, rise } = props;
-
+  const { name, salary, onDelete, onToggleProp, bonus, rise, onManualyUpdateSalary } = props;
+  const [newSalary, setNewSalary] = useState(salary);
   let employeeClass = 'list-group-item d-flex justify-content-between';
   if (bonus) {
     employeeClass += ' increase';
@@ -11,12 +12,31 @@ const EmployeesListItem = (props) => {
     employeeClass += ' like';
   }
 
+  // onManualyUpdateSalary
+  const handleSalaryChange = (event) => {
+    const myString = event.target.value;
+
+    let newSalaryValue = parseInt(myString, 10);
+
+    setNewSalary((prevSalary) => {
+      return newSalaryValue;
+    });
+    onManualyUpdateSalary(newSalaryValue);
+  };
+
   return (
     <li className={employeeClass}>
       <span onClick={onToggleProp} data-toggle="rise" className="list-group-item-label">
         {name}
       </span>
-      <input type="text" className="list-group-item-input" defaultValue={salary + '$'} />
+      <input
+        type="text"
+        onChange={handleSalaryChange}
+        className="list-group-item-input"
+        // value={newSalary}
+        value={newSalary.toString().includes('$') ? newSalary : `${newSalary}$`}
+      />
+
       <div className="d-flex justify-content-center align-items-center">
         <button
           onClick={onToggleProp}
