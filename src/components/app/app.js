@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import nextId from 'react-id-generator';
+// import nextId from 'react-id-generator';
 import AppInfo from '../app-info/app-info';
 import SearchPanel from '../search-panel/search-panel';
 import AppFilter from '../app-filter/app-filter';
@@ -13,10 +13,12 @@ class App extends Component {
     super(props);
     this.state = {
       data: [
-        { name: 'John Smith', salary: 1000, bonus: false, rise: false, id: 1 },
+        { name: 'John Smith', salary: 1000, bonus: false, rise: true, id: 1 },
         { name: 'Greg Connnor', salary: 800, bonus: true, rise: false, id: 2 },
         { name: 'Mike Hearn', salary: 2000, bonus: false, rise: false, id: 3 },
       ],
+      term: '',
+      filter: 'all',
     };
     this.maxId = 4;
   }
@@ -26,34 +28,88 @@ class App extends Component {
   };
 
   addItem = (name, salary) => {
-    const newId = nextId();
-    const newItem = { name, salary, bonus: false, id: newId };
+    const newId = this.maxId++;
+    const newItem = { name, salary, bonus: false, rise: false, id: newId };
     this.setState(({ data }) => ({
       data: [...this.state.data, newItem],
     }));
-    console.log(this.state.data);
+    // console.log(this.state.data);
   };
 
-  onToggleIncrease = (id) => {
-    console.log(`increase this ${id}`);
+  onToggleProp = (id, prop) => {
+    this.setState(({ data }) => ({
+      data: data.map((item) => {
+        if (item.id === id) {
+          return { ...item, [prop]: !item[prop] };
+        }
+        return item;
+      }),
+    }));
   };
-  onToggleBonus = (id) => {
-    console.log(`rise this ${id}`);
+
+  searchEmp = (items, term) => {
+    if (term.length === 0) {
+      return items;
+    }
+    return items.filter((item) => {
+      return item.name.indexOf(term) > -1;
+    });
+  };
+
+  onUpdateSearch = (term) => {
+    this.setState({ term });
+  };
+
+  onFilter = (condition, items) => {
+    // if (condition === 'all') {
+    //   return items;
+    // }
+    // if (condition === 'promotion') {
+    //   return items.filter((item) => {
+    //     return item.bonus;
+    //   });
+    // }
+    // if (condition === 'salary1000') {
+    //   return items.filter((item) => {
+    //     return item.salary >= 1000;
+    //   });
+    // }
+    switch (condition) {
+      case 'promotion':
+        return items.filter((item) => {
+          return item.bonus;
+        });
+      case 'salary1000':
+        return items.filter((item) => {
+          return item.salary >= 1000;
+        });
+      default:
+        return items;
+    }
+  };
+
+  onUpdateFilter = (filter) => {
+    this.setState({ filter });
   };
 
   render() {
+    const { data, term, filter } = this.state;
+    const employees = data.length;
+    const increased = data.filter((item) => item.bonus).length;
+    const filteredData = this.onFilter(filter, data);
+    const visibleData = this.searchEmp(filteredData, term);
+
     return (
       <div className="app">
-        <AppInfo />
+        <AppInfo employees={employees} increased={increased} />
         <div className="search-panel">
-          <SearchPanel />
-          <AppFilter />
+          <SearchPanel onUpdateSearch={this.onUpdateSearch} />
+          <AppFilter onUpdateFilter={this.onUpdateFilter} filter={filter} />
         </div>
         <EmployeesList
-          data={this.state.data}
+          data={visibleData}
           onDelete={this.deleteItem}
-          onToggleIncrease={this.onToggleIncrease}
-          onToggleBonus={this.onToggleBonus}
+          onToggleProp={this.onToggleProp}
         />
         <EmployeesAddForm onAdd={this.addItem} />
       </div>
